@@ -1,0 +1,16 @@
+list:
+  path: '/users'
+  controller:  App\Controller\UserController::listAction
+  methods: [ GET ]
+
+add:
+  path: '/users'
+  controller:  App\Controller\UserController::addAction
+  methods: [ POST ]
+
+delete:
+  path: '/users/{id}'
+  controller:  App\Controller\UserController::deleteAction
+  requirements:
+    id: '\d+'
+  methods: [ DELETE ]

@@ -1,5 +1,5 @@
 ### JetBrains template
-.idea/
+/.idea/
 
 ###> symfony/framework-bundle ###
 /.env
