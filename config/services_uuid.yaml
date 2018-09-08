@@ -1,0 +1,5 @@
+services:
+    Ramsey\Uuid\UuidFactory: ~
+
+    Ramsey\Uuid\UuidFactoryInterface:
+        alias: 'Ramsey\Uuid\UuidFactory'

@@ -1,5 +1,5 @@
-const ENDPOINT_USERS = 'users';
-const ENDPOINT_USER = 'users/{id}';
+const ENDPOINT_PRODUCTS = 'products';
+const ENDPOINT_PRODUCT = 'products/{id}';
 
 class ApiClient {
 
@@ -8,6 +8,43 @@ class ApiClient {
         this.baseUrl = baseUrl;
     }
 
+    /**
+     * @param {Response} response
+     * @return {Response}
+     * @private
+     */
+    _filterErrorResponse(response)
+    {
+        if (response.status >= 400) {
+            return Promise.reject('internal server error');
+        }
+
+        return response;
+    }
+
+    /**
+     * @param {Response} response
+     * @return {Response}
+     * @private
+     */
+    _filterNonJsonResponse(response)
+    {
+        if (false === response.headers.has('content-type')) {
+            return Promise.reject('unknown response content-type');
+        }
+
+        if (-1 === response.headers.get('content-type').indexOf('json')) {
+            return Promise.reject('response is not json');
+        }
+
+        return response;
+    }
+
+    /**
+     * @param {string} endpoint
+     * @return {string}
+     * @private
+     */
     _makeApiUrl(endpoint)
     {
         return `${this.baseUrl}/${endpoint}?XDEBUG_SESSION_START=PHPSTORM`;
@@ -28,46 +65,42 @@ class ApiClient {
             options.body = body;
         }
 
-        return fetch(this._makeApiUrl(endpoint), options);
+        return fetch(this._makeApiUrl(endpoint), options)
+            .then(response => this._filterErrorResponse(response))
+        ;
     }
 
     /** @return {Promise} */
-    getUsers()
+    getProducts()
     {
-        return this._sendRequest(ENDPOINT_USERS, 'GET').then(
-            response => response.json()
-        ).catch(e => console.warn(e));
+        return this._sendRequest(ENDPOINT_PRODUCTS, 'GET')
+            .then(response => this._filterNonJsonResponse(response))
+            .then(response => response.json())
+        ;
     }
 
     /**
      * @param {FormData} formData
      * @return {Promise}
      */
-    addUser(formData)
+    addProduct(formData)
     {
-        return this._sendRequest(ENDPOINT_USERS, 'POST', formData).then(response => {
-            if (response.status >= 400) {
-                return Promise.reject('add user error');
-            }
-
-            return response;
-        })
+        return this._sendRequest(ENDPOINT_PRODUCTS, 'POST', formData)
+            .then(response => this._filterNonJsonResponse(response))
             .then(response => response.json())
         ;
     }
 
-    removeUser(id)
+    /**
+     * @param {string} id
+     * @return {Promise}
+     */
+    removeProduct(id)
     {
-        return this._sendRequest(
-            ENDPOINT_USER.replace('{id}', id),
-            'DELETE'
-        ).then(response => {
-            if (response.status >= 400) {
-                return Promise.reject('remove user error');
-            }
-
-            return true;
-        });
+        return this._sendRequest(ENDPOINT_PRODUCT.replace('{id}', id), 'DELETE')
+            .then(response => this._filterNonJsonResponse(response))
+            .then(response => response.json())
+        ;
     }
 }
 

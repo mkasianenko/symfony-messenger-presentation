@@ -1,0 +1,16 @@
+list:
+  path: '/products'
+  controller:  App\Controller\ProductsController::listAction
+  methods: [ GET ]
+
+add:
+  path: '/products'
+  controller:  App\Controller\ProductsController::addAction
+  methods: [ POST ]
+
+delete:
+  path: '/products/{id}'
+  controller:  App\Controller\ProductsController::deleteAction
+  requirements:
+    id: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+  methods: [ DELETE ]

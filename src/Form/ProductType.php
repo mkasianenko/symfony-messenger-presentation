@@ -1,22 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
-use App\Entity\User;
+use App\Entity\Product;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class UserType extends AbstractType
+class ProductType extends AbstractType
 {
-    public const REQUEST_NAME = 'User';
+    public const REQUEST_NAME = 'Product';
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => User::class,
+            'data_class' => Product::class,
             'method' => 'POST'
         ]);
     }
@@ -25,8 +28,10 @@ class UserType extends AbstractType
     {
 
         $builder
-            ->add('email', TextType::class)
-            ->add('password', PasswordType::class)
+            ->add('sku', TextType::class)
+            ->add('price', NumberType::class)
+            ->add('name', TextType::class)
+            ->add('description', TextareaType::class)
         ;
     }
 

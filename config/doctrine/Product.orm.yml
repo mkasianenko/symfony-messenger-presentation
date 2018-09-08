@@ -1,0 +1,25 @@
+App\Entity\Product:
+    type: entity
+    table: products
+    id:
+        id:
+            type: guid
+            generator:
+                strategy: NONE
+    fields:
+        sku:
+            type: string
+            length: 255
+            unique: true
+        price:
+            type: decimal
+            precision: 10
+            scale: 4
+            nullable: false
+        name:
+            type: string
+            length: 255
+            nullable: false
+        description:
+            type: text
+            nullable: true
