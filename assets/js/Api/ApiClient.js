@@ -1,7 +1,7 @@
 const ENDPOINT_PRODUCTS = 'products';
 const ENDPOINT_PRODUCT = 'products/{id}';
 
-class ApiClient {
+export default class ApiClient {
 
     constructor(baseUrl)
     {
@@ -102,6 +102,4 @@ class ApiClient {
             .then(response => response.json())
         ;
     }
-}
-
-export default ApiClient;
+};

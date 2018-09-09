@@ -1,10 +1,14 @@
-import React, {Component} from "react";
-import Product from './Product';
+import React, {Component} from 'react';
 import { tables } from 'bootstrap-css'
+
+import Product from './Product';
 
 export default class ProductsTable extends Component {
 
     render() {
+        const {store, apiClient, updateProducts} = this.props;
+        const {products} = store.getState();
+
         return (
             <table className="table">
                 <thead className="table-inverse">
@@ -17,15 +21,15 @@ export default class ProductsTable extends Component {
                     </tr>
                 </thead>
                 <tbody>
-                    {this.props.products.map(
+                    {products.map(
                         (product, index) => {
                             return <Product
                                 key={index}
-                                product={product}
                                 view='tr'
-                                updateProducts={this.props.updateProducts}
-                                setErrorAlert={this.props.setErrorAlert}
-                                apiClient={this.props.apiClient}
+                                store={store}
+                                product={product}
+                                apiClient={apiClient}
+                                updateProducts={updateProducts}
                             />
                         }
                     )}

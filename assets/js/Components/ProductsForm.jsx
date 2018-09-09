@@ -1,70 +1,77 @@
-import React, {Component} from "react";
+import React, {Component} from 'react';
 import { forms, buttons } from 'bootstrap-css'
+
+import {
+    formSubmittingSet,
+    formProductSet,
+    formErrorsSet,
+    globalMessageSetSuccess,
+    globalMessageSetError
+} from '../actions/actions';
 
 export default class ProductsForm extends Component {
 
     constructor(props)
     {
         super(props);
-        this.state = {
-            product: null,
-            errors: {},
-            submitting: false
-        };
         this.onSubmit = this.onSubmit.bind(this);
         this._getErrors = this._getErrors.bind(this);
         this._hasError = this._hasError.bind(this);
         this._printInvalidFeedback = this._printInvalidFeedback.bind(this);
         this._getInputWrapperClassName = this._getInputWrapperClassName.bind(this);
         this._getInputDefaultValue = this._getInputDefaultValue.bind(this);
-    }
 
-    UNSAFE_componentWillReceiveProps(nextProps)
-    {
-        this.setState({errors: {}, submitting: false});
+        this.formRef = React.createRef();
     }
 
     onSubmit(e)
     {
         e.preventDefault();
+        const {store, apiClient, updateProducts} = this.props;
         const formData = new FormData(e.target);
-        this.setState(
-            {
-                product: {
-                    'sku': formData.get('Product[sku]'),
-                    'price': formData.get('Product[price]'),
-                    'name': formData.get('Product[name]'),
-                    'description': formData.get('Product[description]'),
-                },
-                submitting: true
-            }
-        );
-        this.props.apiClient.addProduct(formData).then(
+
+        store.dispatch(formSubmittingSet(true));
+        store.dispatch(formProductSet({
+            'sku': formData.get('Product[sku]'),
+            'price': formData.get('Product[price]'),
+            'name': formData.get('Product[name]'),
+            'description': formData.get('Product[description]'),
+        }));
+
+        apiClient.addProduct(formData).then(
             data => {
+                store.dispatch(formSubmittingSet(false));
                 if (data.success) {
-                    return this.props.updateProducts(data.successMessage);
+                    this.formRef.reset();
+                    store.dispatch(formProductSet(null));
+                    if (data.successMessage) {
+                        store.dispatch(globalMessageSetSuccess(data.successMessage));
+                    }
+
+                    return updateProducts();
                 }
 
-                const newState = {submitting: false};
                 if (data.errors) {
-                    newState.errors = data.errors;
+                    store.dispatch(formErrorsSet(data.errors));
                 }
-
-                this.setState(newState);
             },
-            e => this.props.setErrorAlert(e)
+            e => {
+                store.dispatch(formSubmittingSet(false));
+                store.dispatch(globalMessageSetError(e));
+            }
         );
     }
 
     /**
      * @param {String} fieldName
-     * @return {Boolean}
+     * @return {Array}
      * */
     _getErrors(fieldName)
     {
-        const errors = this.state.errors;
-        if (errors[fieldName] && errors[fieldName].length > 0) {
-            return errors[fieldName];
+        const {store} = this.props;
+        const {formErrors} = store.getState();
+        if (formErrors[fieldName] && formErrors[fieldName].length > 0) {
+            return formErrors[fieldName];
         }
 
         return [];
@@ -113,22 +120,27 @@ export default class ProductsForm extends Component {
      */
     _getInputDefaultValue(fieldName)
     {
-        if (null === this.state.product) {
+        const {store} = this.props;
+        const {formProduct} = store.getState();
+        if (null === formProduct) {
             return null;
         }
 
-        const fieldValue = this.state.product[fieldName];
+        const fieldValue = formProduct[fieldName];
 
         return fieldValue ? fieldValue : null;
     }
 
     render()
     {
-        if (this.state.submitting) {
+        const {store} = this.props;
+        const {formSubmitting} = store.getState();
+
+        if (formSubmitting) {
             return <div>...Submitting...</div>
         }
 
-        return <form name="Product" onSubmit={this.onSubmit}>
+        return <form name="Product" onSubmit={this.onSubmit} ref={e => this.formRef = e}>
             <div className="form-group">
                 <div className="form-row">
                     <div className={this._getInputWrapperClassName('sku')}>
