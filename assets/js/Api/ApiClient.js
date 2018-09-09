@@ -114,4 +114,17 @@ export default class ApiClient {
             .then(response => response.json())
         ;
     }
+
+    /**
+     * @param {FormData} formData
+     * @param {string} id
+     * @return {Promise}
+     */
+    editProduct(formData, id)
+    {
+        return this._sendRequest(ENDPOINT_PRODUCT.replace('{id}', id), 'POST', formData)
+            .then(response => this._filterNonJsonResponse(response))
+            .then(response => response.json())
+        ;
+    }
 };

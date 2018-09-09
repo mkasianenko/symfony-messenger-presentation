@@ -26,7 +26,7 @@ class Product implements \JsonSerializable
         return $this->id;
     }
 
-    public function setId(string $id): self
+    public function setId(?string $id): self
     {
         $this->id = $id;
 

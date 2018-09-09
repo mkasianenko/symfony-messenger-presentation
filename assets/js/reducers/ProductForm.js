@@ -11,16 +11,16 @@ export default class ProductForm
     /**
      * @param {Object} formProduct
      * @param {Object} formErrors
-     * @param {Boolean} formSubmitting
+     * @param {String} submittingFormId
      * @return {{}}
      * @private
      */
-    _createState(formProduct, formErrors, formSubmitting)
+    _createState(formProduct, formErrors, submittingFormId)
     {
         return {
             formProduct: formProduct,
             formErrors: formErrors,
-            formSubmitting: formSubmitting
+            submittingFormId: submittingFormId
         };
     }
 
@@ -31,19 +31,27 @@ export default class ProductForm
      */
     reduce(state = {}, action)
     {
-        const {formProduct, formErrors, formSubmitting} = state;
+        const {formProduct, formErrors, submittingFormId} = state;
 
         switch (action.type) {
             case actionTypes.FORM_PRODUCT_SET:
-                return this._createState(action.product, {}, formSubmitting);
+                return this._createState(
+                    {formId: action.formId, product: action.product},
+                    formErrors,
+                    submittingFormId
+                );
             case actionTypes.FORM_ERRORS_SET:
-                return this._createState(formProduct, action.errors, false);
+                return this._createState(
+                    formProduct,
+                    {formId: action.formId, errors: action.errors},
+                    submittingFormId
+                );
             case actionTypes.FORM_SUBMITTING_SET:
-                return this._createState(formProduct, formErrors, action.submitting);
+                return this._createState(formProduct, formErrors, action.formId);
             default:
                 break;
         }
 
-        return this._createState(formProduct, formErrors, formSubmitting);
+        return this._createState(formProduct, formErrors, submittingFormId);
     }
 };

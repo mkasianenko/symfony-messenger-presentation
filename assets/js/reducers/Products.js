@@ -14,16 +14,18 @@ export default class Products
     /**
      * @param {Object[]} products
      * @param {Boolean} productsLoading
-     * @param {Boolean} removingProductId
+     * @param {String} removingProductId
+     * @param {String} editingProductId
      * @return {{}}
      * @private
      */
-    _createState(products, productsLoading, removingProductId)
+    _createState(products, productsLoading, removingProductId, editingProductId)
     {
         return {
             products: products,
             productsLoading: productsLoading,
-            removingProductId: removingProductId
+            removingProductId: removingProductId,
+            editingProductId: editingProductId
         };
     }
 
@@ -34,41 +36,54 @@ export default class Products
      */
     reduce(state = {}, action)
     {
-        const {products, productsLoading, removingProductId} = state;
+        const {products, productsLoading, removingProductId, editingProductId} = state;
 
         switch (action.type) {
             case actionTypes.PRODUCTS_LOADING:
-                return this._createState(products, true, null);
+                return this._createState(products, true, removingProductId, editingProductId);
             case actionTypes.PRODUCTS_UPDATE:
-                return this._createState(action.products, false, null);
+                return this._createState(action.products, false, removingProductId, editingProductId);
             case actionTypes.PRODUCT_ADD:
                 return this._createState(
                     products.concat([Object.assign({}, action.product)]),
-                    false,
-                    null
+                    productsLoading,
+                    removingProductId,
+                    editingProductId
                 );
-            case actionTypes.PRODUCT_EDIT:
+            case actionTypes.PRODUCT_EDITING:
                 return this._createState(
-                    products.map(product => action.product.id === product.id ? action.product: product),
-                    false,
+                    products,
+                    productsLoading,
+                    removingProductId,
+                    action.id
+                );
+            case actionTypes.PRODUCT_UPDATED:
+                return this._createState(
+                    products.map(
+                        product => action.product.id === product.id ? Object.assign({}, action.product): product
+                    ),
+                    productsLoading,
+                    removingProductId,
                     null
                 );
             case actionTypes.PRODUCT_REMOVING:
                 return this._createState(
                     products,
-                    false,
-                    action.id
+                    productsLoading,
+                    action.id,
+                    editingProductId
                 );
             case actionTypes.PRODUCT_REMOVED:
                 return this._createState(
                     products.filter(product => action.id !== product.id),
-                    false,
-                    null
+                    productsLoading,
+                    null,
+                    editingProductId
                 );
             default:
                 break;
         }
 
-        return this._createState(products, productsLoading, removingProductId);
+        return this._createState(products, productsLoading, removingProductId, editingProductId);
     }
 };

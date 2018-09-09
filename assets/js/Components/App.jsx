@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import { grid } from 'bootstrap-css'
+import uuid from 'uuid';
 
 import ProductsTable from './ProductsTable';
 import ProductsForm from './ProductsForm';
 import HeaderAlert from './HeaderAlert';
 
-import {productsUpdate, globalMessageSetError} from '../actions/actions';
+import {productsUpdate, globalMessageSetError, productAdd} from '../actions/actions';
 
 export default class App extends Component {
 
@@ -18,6 +19,7 @@ export default class App extends Component {
         store.subscribe(() => self.setState(store.getState()));
 
         this._loadProducts = this._loadProducts.bind(this);
+        this.productAddFormId = uuid.v4();
     }
 
     _loadProducts()
@@ -48,7 +50,15 @@ export default class App extends Component {
                     <div className="col-md-6">
                         <h3 className="text-center">Products form</h3>
                         <div>
-                            <ProductsForm store={store} apiClient={apiClient}/>
+                            <ProductsForm
+                                store={store}
+                                apiClient={apiClient}
+                                apiClientAction="addProduct"
+                                productAction={productAdd}
+                                submitText="submit"
+                                formId={this.productAddFormId}
+                                view="full"
+                            />
                         </div>
                     </div>
                 </div>

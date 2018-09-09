@@ -1,13 +1,12 @@
 import React, {Component} from 'react';
-import { forms, buttons } from 'bootstrap-css'
+import { forms, buttons } from 'bootstrap-css';
 
 import {
     formSubmittingSet,
     formProductSet,
     formErrorsSet,
     globalMessageSetSuccess,
-    globalMessageSetError,
-    productAdd
+    globalMessageSetError
 } from '../actions/actions';
 
 export default class ProductsForm extends Component {
@@ -19,7 +18,7 @@ export default class ProductsForm extends Component {
         this._getErrors = this._getErrors.bind(this);
         this._hasError = this._hasError.bind(this);
         this._printInvalidFeedback = this._printInvalidFeedback.bind(this);
-        this._getInputWrapperClassName = this._getInputWrapperClassName.bind(this);
+        this._getInputWrapperErrorClass = this._getInputWrapperErrorClass.bind(this);
         this._getInputDefaultValue = this._getInputDefaultValue.bind(this);
         this._resetInputs = this._resetInputs.bind(this);
         this._attemptLoadProduct = this._attemptLoadProduct.bind(this);
@@ -33,23 +32,24 @@ export default class ProductsForm extends Component {
     onSubmit(e)
     {
         e.preventDefault();
-        const {store, apiClient} = this.props;
+        const {store, apiClient, apiClientAction, formId} = this.props;
         const formData = new FormData(e.target);
 
-        store.dispatch(formSubmittingSet(true));
-        store.dispatch(formProductSet({
+        store.dispatch(formSubmittingSet(formId));
+        store.dispatch(formProductSet(formId, {
             'sku': formData.get('Product[sku]'),
             'price': formData.get('Product[price]'),
             'name': formData.get('Product[name]'),
             'description': formData.get('Product[description]'),
         }));
 
-        apiClient.addProduct(formData).then(
+        apiClient[apiClientAction](formData, formId).then(
             data => {
-                store.dispatch(formSubmittingSet(false));
+                store.dispatch(formSubmittingSet(null));
                 if (data.success) {
                     this._resetInputs();
-                    store.dispatch(formProductSet(null));
+                    store.dispatch(formProductSet(formId, null));
+                    store.dispatch(formErrorsSet(formId, {}));
                     if (data.successMessage) {
                         store.dispatch(globalMessageSetSuccess(data.successMessage));
                     }
@@ -60,11 +60,11 @@ export default class ProductsForm extends Component {
                 }
 
                 if (data.errors) {
-                    store.dispatch(formErrorsSet(data.errors));
+                    store.dispatch(formErrorsSet(formId, data.errors));
                 }
             },
             e => {
-                store.dispatch(formSubmittingSet(false));
+                store.dispatch(formSubmittingSet(null));
                 store.dispatch(globalMessageSetError(e));
             }
         );
@@ -79,7 +79,7 @@ export default class ProductsForm extends Component {
      */
     _attemptLoadProduct(id, timeoutSeconds = 1, attempts = 5, increment = 5)
     {
-        const {store, apiClient} = this.props;
+        const {store, apiClient, productAction} = this.props;
         let attemptNum = 0;
         let finished = false;
         let timeout = timeoutSeconds;
@@ -98,7 +98,7 @@ export default class ProductsForm extends Component {
                 apiClient.getProduct(id).then(
                     product => {
                         finished = true;
-                        store.dispatch(productAdd(product));
+                        store.dispatch(productAction(product));
                     },
                     e => {
                         console.log(e);
@@ -127,19 +127,30 @@ export default class ProductsForm extends Component {
     {
         const {store} = this.props;
         const {formErrors} = store.getState();
-        if (formErrors[fieldName] && formErrors[fieldName].length > 0) {
-            return formErrors[fieldName];
+        const {formId, errors} = formErrors;
+
+        if (formId !== this.props.formId || null === errors) {
+            return [];
+        }
+
+        if (errors[fieldName] && errors[fieldName].length > 0) {
+            return errors[fieldName];
         }
 
         return [];
     }
 
     /**
-     * @param {String} fieldName
+     * @param {String|Array} fieldName
      * @return {Boolean}
      * */
     _hasError(fieldName)
     {
+        if ('object' === typeof fieldName && fieldName.length) {
+            const self = this;
+            return fieldName.filter(name => false !== self._hasError(name)).length > 0;
+        }
+
         return this._getErrors(fieldName).length > 0;
     }
 
@@ -161,13 +172,13 @@ export default class ProductsForm extends Component {
     }
 
     /**
-     * @param {string} fieldName
+     * @param {string|Array} fieldName
      * @return {string}
      * @private
      */
-    _getInputWrapperClassName(fieldName)
+    _getInputWrapperErrorClass(fieldName)
     {
-        return this._hasError(fieldName) ? 'col has-danger' : 'col'
+        return this._hasError(fieldName) ? 'has-danger' : '';
     }
 
     /**
@@ -179,28 +190,109 @@ export default class ProductsForm extends Component {
     {
         const {store} = this.props;
         const {formProduct} = store.getState();
-        if (null === formProduct) {
+
+        const {formId, product} = formProduct;
+        if (formId !== this.props.formId) {
             return null;
         }
 
-        const fieldValue = formProduct[fieldName];
+        if (null === product) {
+            return null;
+        }
+
+        const fieldValue = product[fieldName];
 
         return fieldValue ? fieldValue : null;
     }
 
     render()
     {
-        const {store} = this.props;
-        const {formSubmitting} = store.getState();
+        const {store, view, submitText} = this.props;
+        const {submittingFormId} = store.getState();
 
-        if (formSubmitting) {
+        if (submittingFormId === this.props.formId) {
             return <div className="text-center"><h3>...Submitting form...</h3></div>
         }
 
-        return <form name="Product" onSubmit={this.onSubmit}>
-            <div className="form-group">
-                <div className="form-row">
-                    <div className={this._getInputWrapperClassName('sku')}>
+        if ('full' === view) {
+            return <form onSubmit={this.onSubmit}>
+                <div className="form-group">
+                    <div className="form-row">
+                        <div className={'col ' + this._getInputWrapperErrorClass('sku')}>
+                            <input
+                                type="text"
+                                required
+                                name="Product[sku]"
+                                placeholder="Sku"
+                                className="form-control"
+                                defaultValue={this._getInputDefaultValue('sku')}
+                                ref={this.skuInputRef}
+                            />
+                            {this._printInvalidFeedback('sku')}
+                        </div>
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="form-row">
+                        <div className={'col ' +  this._getInputWrapperErrorClass('price')}>
+                            <input
+                                type="number"
+                                step="0.01"
+                                required
+                                name="Product[price]"
+                                placeholder="Price"
+                                className="form-control"
+                                defaultValue={this._getInputDefaultValue('price')}
+                                ref={this.priceInputRef}
+                            />
+                            {this._printInvalidFeedback('price')}
+                        </div>
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="form-row">
+                        <div className={'col ' + this._getInputWrapperErrorClass('name')}>
+                            <input
+                                type="text"
+                                required
+                                name="Product[name]"
+                                placeholder="Name"
+                                className="form-control"
+                                defaultValue={this._getInputDefaultValue('name')}
+                                ref={this.nameInputRef}
+                            />
+                            {this._printInvalidFeedback('name')}
+                        </div>
+                    </div>
+                </div>
+                <div className="form-group">
+                    <div className="form-row">
+                        <div className={'col ' + this._getInputWrapperErrorClass('description')}>
+                            <textarea
+                                name="Product[description]"
+                                placeholder="Description"
+                                className="form-control"
+                                defaultValue={this._getInputDefaultValue('description')}
+                                ref={this.descriptionInputRef}
+                            />
+                            {this._printInvalidFeedback('description')}
+                        </div>
+                    </div>
+                </div>
+                <div className="form-group text-center">
+                    <input
+                        type="submit"
+                        value="Add product"
+                        className="btn btn-success"
+                    />
+                </div>
+            </form>
+        }
+
+        if ('td' === view) {
+            return <div>
+                <form className="row no-gutters" onSubmit={this.onSubmit}>
+                    <div className={'col-md-2 ' + this._getInputWrapperErrorClass('sku')}>
                         <input
                             type="text"
                             required
@@ -210,13 +302,8 @@ export default class ProductsForm extends Component {
                             defaultValue={this._getInputDefaultValue('sku')}
                             ref={this.skuInputRef}
                         />
-                        {this._printInvalidFeedback('sku')}
                     </div>
-                </div>
-            </div>
-            <div className="form-group">
-                <div className="form-row">
-                    <div className={this._getInputWrapperClassName('price')}>
+                    <div className={'col-md-2 ' + this._getInputWrapperErrorClass('price')}>
                         <input
                             type="number"
                             step="0.01"
@@ -227,13 +314,8 @@ export default class ProductsForm extends Component {
                             defaultValue={this._getInputDefaultValue('price')}
                             ref={this.priceInputRef}
                         />
-                        {this._printInvalidFeedback('price')}
                     </div>
-                </div>
-            </div>
-            <div className="form-group">
-                <div className="form-row">
-                    <div className={this._getInputWrapperClassName('name')}>
+                    <div className={'col-md-2 ' + this._getInputWrapperErrorClass('name')}>
                         <input
                             type="text"
                             required
@@ -243,31 +325,33 @@ export default class ProductsForm extends Component {
                             defaultValue={this._getInputDefaultValue('name')}
                             ref={this.nameInputRef}
                         />
-                        {this._printInvalidFeedback('name')}
                     </div>
-                </div>
-            </div>
-            <div className="form-group">
-                <div className="form-row">
-                    <div className={this._getInputWrapperClassName('description')}>
-                        <textarea
-                            name="Product[description]"
-                            placeholder="Description"
-                            className="form-control"
-                            defaultValue={this._getInputDefaultValue('description')}
-                            ref={this.descriptionInputRef}
+                    <div className={'col-md-4 ' + this._getInputWrapperErrorClass('description')}>
+                    <textarea
+                        name="Product[description]"
+                        placeholder="Description"
+                        className="form-control"
+                        defaultValue={this._getInputDefaultValue('description')}
+                        ref={this.descriptionInputRef}
+                    />
+                    </div>
+                    <div className="col-md-2 text-center">
+                        <input
+                            type="submit"
+                            value={submitText}
+                            className="btn btn-sm btn-success"
                         />
-                        {this._printInvalidFeedback('description')}
                     </div>
+                </form>
+                <div className={"col-md-12 " + this._getInputWrapperErrorClass(['sku', 'price', 'name', 'description'])}>
+                    {this._printInvalidFeedback('sku')}
+                    {this._printInvalidFeedback('price')}
+                    {this._printInvalidFeedback('name')}
+                    {this._printInvalidFeedback('description')}
                 </div>
-            </div>
-            <div className="form-group text-center">
-                <input
-                    type="submit"
-                    value="Add product"
-                    className="btn btn-success"
-                />
-            </div>
-        </form>
+            </div>;
+        }
+
+        throw new Error(`ProductForm view #${view} not supported`);
     }
 };

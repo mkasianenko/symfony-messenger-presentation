@@ -1,22 +1,47 @@
 App\Entity\Product:
     properties:
+        id:
+            - Uuid:
+                strict: true
+                versions: [4]
+                groups: [create, edit]
         sku:
-            - NotBlank: ~
+            - NotBlank:
+                groups: [create, edit]
             - Length:
+                groups: [create, edit]
                 min: 2
                 max: 254
-            - App\Validator\Constraints\UniqueProductSku: ~
+                minMessage: Sku value is too short. It should have {{ limit }} characters or more.
+                maxMessage: Sku value is too long. It should have {{ limit }} characters or less.
+            - App\Validator\Constraints\UniqueProductSku:
+                groups: [create]
         price:
-            - NotBlank: ~
+            - NotBlank:
+                groups: [create, edit]
             - Type:
+                groups: [create, edit]
                 type: numeric
-            - LessThanOrEqual: 9999999999.9999
-            - GreaterThan: 0
+                message: Price value should be of type {{ type }}.
+            - LessThanOrEqual:
+                groups: [create, edit]
+                value: 9999999999.9999
+                message: Price value should be less than or equal to {{ compared_value }}.
+            - GreaterThan:
+                groups: [create, edit]
+                value: 0
+                message: Price value should be greater than {{ compared_value }}.
         name:
-            - NotBlank: ~
+            - NotBlank:
+                groups: [create, edit]
             - Length:
+                groups: [create, edit]
                 min: 5
                 max: 254
+                minMessage: Name value is too short. It should have {{ limit }} characters or more.
+                maxMessage: Name value is too long. It should have {{ limit }} characters or less.
         description:
             - Length:
+                groups: [create, edit]
                 max: 4000
+                maxMessage: Description value is too long. It should have {{ limit }} characters or less.

@@ -30,7 +30,6 @@ export default class ProductsTable extends Component {
             (product, index) => {
                 return <Product
                     key={index}
-                    view='tr'
                     store={store}
                     product={product}
                     apiClient={apiClient}

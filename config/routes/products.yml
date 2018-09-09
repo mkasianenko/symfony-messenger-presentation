@@ -6,11 +6,20 @@ products_list:
 product_get:
     path: '/products/{id}'
     controller:  App\Controller\ProductsController::getAction
+    requirements:
+        id: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
     methods: [ GET ]
 
 product_add:
     path: '/products'
     controller:  App\Controller\ProductsController::addAction
+    methods: [ POST ]
+
+product_edit:
+    path: '/products/{id}'
+    controller:  App\Controller\ProductsController::editAction
+    requirements:
+        id: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
     methods: [ POST ]
 
 product_delete:

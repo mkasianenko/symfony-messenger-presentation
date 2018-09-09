@@ -6,6 +6,7 @@ namespace App\Form;
 
 use App\Entity\Product;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -28,6 +29,7 @@ class ProductType extends AbstractType
     {
 
         $builder
+            ->add('id', HiddenType::class)
             ->add('sku', TextType::class)
             ->add('price', NumberType::class)
             ->add('name', TextType::class)
