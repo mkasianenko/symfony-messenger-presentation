@@ -13,15 +13,14 @@ export default class App extends Component {
     {
         super(props);
         const {store} = this.props;
-        this.state = store.getState();
 
         const self = this;
-        this.props.store.subscribe(() => self.setState(store.getState()));
+        store.subscribe(() => self.setState(store.getState()));
 
-        this.updateProducts = this.updateProducts.bind(this);
+        this._loadProducts = this._loadProducts.bind(this);
     }
 
-    updateProducts()
+    _loadProducts()
     {
         const {store, apiClient} = this.props;
         apiClient.getProducts().then(
@@ -32,30 +31,24 @@ export default class App extends Component {
 
     componentWillMount()
     {
-        this.updateProducts();
+        this._loadProducts();
     }
 
     render() {
+        const {store, apiClient} = this.props;
+
         return (
             <div className="container">
-                <HeaderAlert store={this.props.store} />
+                <HeaderAlert store={store} />
                 <div className={"row"}>
                     <div className="col-md-6">
                         <h3 className="text-center">Products list</h3>
-                        <ProductsTable
-                            store={this.props.store}
-                            apiClient={this.props.apiClient}
-                            updateProducts={this.updateProducts}
-                        />
+                        <ProductsTable store={store} apiClient={apiClient}/>
                     </div>
                     <div className="col-md-6">
                         <h3 className="text-center">Products form</h3>
                         <div>
-                            <ProductsForm
-                                store={this.props.store}
-                                apiClient={this.props.apiClient}
-                                updateProducts={this.updateProducts}
-                            />
+                            <ProductsForm store={store} apiClient={apiClient}/>
                         </div>
                     </div>
                 </div>

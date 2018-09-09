@@ -3,6 +3,7 @@ import { buttons } from 'bootstrap-css'
 
 import {
     productRemoving,
+    productRemoved,
     globalMessageSetSuccess,
     globalMessageSetError
 } from '../actions/actions';
@@ -17,7 +18,7 @@ export default class Product extends Component {
 
     _deleteProduct()
     {
-        const {store, apiClient, updateProducts, product} = this.props;
+        const {store, apiClient, product} = this.props;
         store.dispatch(productRemoving(product.id));
 
         apiClient.removeProduct(product.id)
@@ -28,7 +29,7 @@ export default class Product extends Component {
                             store.dispatch(globalMessageSetSuccess(res.successMessage));
                         }
 
-                        return updateProducts();
+                        return store.dispatch(productRemoved(product.id));
                     }
                 },
                 e => {

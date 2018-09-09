@@ -7,6 +7,9 @@ const products = new Products();
 const productForm = new ProductForm();
 
 export const main = (state = {}, action) => {
+
+    console.info(action);
+
     return Object.assign(
         {},
         state,

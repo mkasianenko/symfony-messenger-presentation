@@ -43,6 +43,12 @@ export default class Products
                 return this._createState(action.products, false, null);
             case actionTypes.PRODUCT_ADD:
                 return this._createState(
+                    products.concat([Object.assign({}, action.product)]),
+                    false,
+                    null
+                );
+            case actionTypes.PRODUCT_EDIT:
+                return this._createState(
                     products.map(product => action.product.id === product.id ? action.product: product),
                     false,
                     null

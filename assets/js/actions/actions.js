@@ -15,6 +15,11 @@ export const productAdd = (product) => ({
     product: product
 });
 
+export const productEdit = (product) => ({
+    type: actionTypes.PRODUCT_EDIT,
+    product: product
+});
+
 export const productRemoving = (id) => ({
     type: actionTypes.PRODUCT_REMOVING,
     id: id

@@ -6,7 +6,8 @@ import {
     formProductSet,
     formErrorsSet,
     globalMessageSetSuccess,
-    globalMessageSetError
+    globalMessageSetError,
+    productAdd
 } from '../actions/actions';
 
 export default class ProductsForm extends Component {
@@ -20,14 +21,19 @@ export default class ProductsForm extends Component {
         this._printInvalidFeedback = this._printInvalidFeedback.bind(this);
         this._getInputWrapperClassName = this._getInputWrapperClassName.bind(this);
         this._getInputDefaultValue = this._getInputDefaultValue.bind(this);
+        this._resetInputs = this._resetInputs.bind(this);
+        this._attemptLoadProduct = this._attemptLoadProduct.bind(this);
 
-        this.formRef = React.createRef();
+        this.skuInputRef = React.createRef();
+        this.priceInputRef = React.createRef();
+        this.nameInputRef = React.createRef();
+        this.descriptionInputRef = React.createRef();
     }
 
     onSubmit(e)
     {
         e.preventDefault();
-        const {store, apiClient, updateProducts} = this.props;
+        const {store, apiClient} = this.props;
         const formData = new FormData(e.target);
 
         store.dispatch(formSubmittingSet(true));
@@ -42,13 +48,15 @@ export default class ProductsForm extends Component {
             data => {
                 store.dispatch(formSubmittingSet(false));
                 if (data.success) {
-                    this.formRef.reset();
+                    this._resetInputs();
                     store.dispatch(formProductSet(null));
                     if (data.successMessage) {
                         store.dispatch(globalMessageSetSuccess(data.successMessage));
                     }
 
-                    return updateProducts();
+                    if (data.id) {
+                        return this._attemptLoadProduct(data.id);
+                    }
                 }
 
                 if (data.errors) {
@@ -60,6 +68,55 @@ export default class ProductsForm extends Component {
                 store.dispatch(globalMessageSetError(e));
             }
         );
+    }
+
+    /**
+     * @param {string} id
+     * @param {number} timeoutSeconds
+     * @param {number} attempts
+     * @param {number} increment
+     * @private
+     */
+    _attemptLoadProduct(id, timeoutSeconds = 1, attempts = 5, increment = 5)
+    {
+        const {store, apiClient} = this.props;
+        let attemptNum = 0;
+        let finished = false;
+        let timeout = timeoutSeconds;
+
+        const loader = () => {
+            attemptNum++;
+            timeout = attemptNum > 1 ? timeout + increment : timeout;
+            console.log(
+                `trying to load added product with id #${id}, attempt #${attemptNum}, timeoutSeconds #${timeout}`
+            );
+            if (finished || attemptNum > attempts) {
+                return;
+            }
+
+            setTimeout(() => {
+                apiClient.getProduct(id).then(
+                    product => {
+                        finished = true;
+                        store.dispatch(productAdd(product));
+                    },
+                    e => {
+                        console.log(e);
+                        loader();
+                    }
+                );
+            }, timeout * 1000);
+        };
+
+        loader();
+    }
+
+    _resetInputs()
+    {
+        this.skuInputRef.current.value = null;
+        this.priceInputRef.current.value = null;
+        this.nameInputRef.current.value = null;
+        this.descriptionInputRef.current.value = null;
     }
 
     /**
@@ -137,10 +194,10 @@ export default class ProductsForm extends Component {
         const {formSubmitting} = store.getState();
 
         if (formSubmitting) {
-            return <div>...Submitting...</div>
+            return <div className="text-center"><h3>...Submitting form...</h3></div>
         }
 
-        return <form name="Product" onSubmit={this.onSubmit} ref={e => this.formRef = e}>
+        return <form name="Product" onSubmit={this.onSubmit}>
             <div className="form-group">
                 <div className="form-row">
                     <div className={this._getInputWrapperClassName('sku')}>
@@ -151,6 +208,7 @@ export default class ProductsForm extends Component {
                             placeholder="Sku"
                             className="form-control"
                             defaultValue={this._getInputDefaultValue('sku')}
+                            ref={this.skuInputRef}
                         />
                         {this._printInvalidFeedback('sku')}
                     </div>
@@ -167,6 +225,7 @@ export default class ProductsForm extends Component {
                             placeholder="Price"
                             className="form-control"
                             defaultValue={this._getInputDefaultValue('price')}
+                            ref={this.priceInputRef}
                         />
                         {this._printInvalidFeedback('price')}
                     </div>
@@ -182,6 +241,7 @@ export default class ProductsForm extends Component {
                             placeholder="Name"
                             className="form-control"
                             defaultValue={this._getInputDefaultValue('name')}
+                            ref={this.nameInputRef}
                         />
                         {this._printInvalidFeedback('name')}
                     </div>
@@ -192,9 +252,10 @@ export default class ProductsForm extends Component {
                     <div className={this._getInputWrapperClassName('description')}>
                         <textarea
                             name="Product[description]"
-                            placeholder="input product description"
+                            placeholder="Description"
                             className="form-control"
                             defaultValue={this._getInputDefaultValue('description')}
+                            ref={this.descriptionInputRef}
                         />
                         {this._printInvalidFeedback('description')}
                     </div>

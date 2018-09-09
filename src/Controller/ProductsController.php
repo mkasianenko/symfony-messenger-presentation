@@ -17,11 +17,17 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ProductsController extends Controller
 {
-    public function listAction(): JsonResponse
+    private const QUERY_PARAM_LIMIT = 'limit';
+    private const QUERY_PARAM_PAGE = 'page';
+
+    public function listAction(Request $request): JsonResponse
     {
         $repository = $this->getDoctrine()->getRepository(Product::class);
 
-        $products = $repository->findBy([], ['sku' => 'ASC'], 10, 0);
+        $limit = $request->query->getInt(self::QUERY_PARAM_LIMIT, 5);
+        $page = $request->query->getInt(self::QUERY_PARAM_PAGE, 0);
+
+        $products = $repository->findBy([], ['sku' => 'ASC'], $limit, $page);
 
         return new JsonResponse($products);
     }
@@ -44,7 +50,8 @@ class ProductsController extends Controller
                     'Product with sku #%s and id #%s successfully added',
                     $product->getSku(),
                     $product->getId()
-                )
+                ),
+                'id' => $product->getId()
             ]);
         }
 
@@ -79,5 +86,15 @@ class ProductsController extends Controller
                 $product->getId()
             )
         ]);
+    }
+
+    public function getAction(string $id): Response
+    {
+        $repository = $this->getDoctrine()->getRepository(Product::class);
+        if (null === $product = $repository->find($id)) {
+            return new Response('', Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse($product);
     }
 }

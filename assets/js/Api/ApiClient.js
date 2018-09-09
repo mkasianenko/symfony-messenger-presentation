@@ -102,4 +102,16 @@ export default class ApiClient {
             .then(response => response.json())
         ;
     }
+
+    /**
+     * @param {string} id
+     * @return {Promise}
+     */
+    getProduct(id)
+    {
+        return this._sendRequest(ENDPOINT_PRODUCT.replace('{id}', id), 'GET')
+            .then(response => this._filterNonJsonResponse(response))
+            .then(response => response.json())
+        ;
+    }
 };
