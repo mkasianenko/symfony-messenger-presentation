@@ -20,7 +20,7 @@ product_edit:
     controller:  App\Controller\ProductsController::editAction
     requirements:
         id: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-    methods: [ POST ]
+    methods: [ PUT ]
 
 product_delete:
     path: '/products/{id}'

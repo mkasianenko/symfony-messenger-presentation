@@ -64,7 +64,7 @@ export default class Products
                     ),
                     productsLoading,
                     removingProductId,
-                    null
+                    editingProductId
                 );
             case actionTypes.PRODUCT_REMOVING:
                 return this._createState(

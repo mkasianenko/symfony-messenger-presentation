@@ -53,13 +53,12 @@ export default class ApiClient {
     /**
      * @param {String} endpoint
      * @param {String} method
-     * @param {FormData|null} body
+     * @param {FormData|URLSearchParams|null} body
      * @return {Promise}
      * @private
      */
     _sendRequest(endpoint, method, body)
     {
-        let self = this;
         const options = {method: method};
         if (body) {
             options.body = body;
@@ -80,12 +79,12 @@ export default class ApiClient {
     }
 
     /**
-     * @param {FormData} formData
+     * @param {FormData|URLSearchParams} body
      * @return {Promise}
      */
-    addProduct(formData)
+    addProduct(body)
     {
-        return this._sendRequest(ENDPOINT_PRODUCTS, 'POST', formData)
+        return this._sendRequest(ENDPOINT_PRODUCTS, 'POST', body)
             .then(response => this._filterNonJsonResponse(response))
             .then(response => response.json())
         ;
@@ -116,13 +115,13 @@ export default class ApiClient {
     }
 
     /**
-     * @param {FormData} formData
+     * @param {FormData|URLSearchParams} body
      * @param {string} id
      * @return {Promise}
      */
-    editProduct(formData, id)
+    editProduct(body, id)
     {
-        return this._sendRequest(ENDPOINT_PRODUCT.replace('{id}', id), 'POST', formData)
+        return this._sendRequest(ENDPOINT_PRODUCT.replace('{id}', id), 'PUT', body)
             .then(response => this._filterNonJsonResponse(response))
             .then(response => response.json())
         ;

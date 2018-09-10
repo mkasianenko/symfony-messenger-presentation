@@ -39,9 +39,6 @@ export default class ProductsTable extends Component {
     }
 
     render() {
-        const {store, apiClient} = this.props;
-        const {products, productsLoading} = store.getState();
-
         return (
             <table className="table">
                 <thead className="table-inverse">

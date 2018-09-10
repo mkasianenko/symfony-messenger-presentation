@@ -33,7 +33,7 @@ export default class ProductsForm extends Component {
     {
         e.preventDefault();
         const {store, apiClient, apiClientAction, formId} = this.props;
-        const formData = new FormData(e.target);
+        const formData = new URLSearchParams(new FormData(e.target));
 
         store.dispatch(formSubmittingSet(formId));
         store.dispatch(formProductSet(formId, {
@@ -291,8 +291,8 @@ export default class ProductsForm extends Component {
 
         if ('td' === view) {
             return <div>
-                <form className="row no-gutters" onSubmit={this.onSubmit}>
-                    <div className={'col-md-2 ' + this._getInputWrapperErrorClass('sku')}>
+                <form className="row edit-items" onSubmit={this.onSubmit}>
+                    <div className={'edit-item ' + this._getInputWrapperErrorClass('sku')}>
                         <input
                             type="text"
                             required
@@ -303,7 +303,7 @@ export default class ProductsForm extends Component {
                             ref={this.skuInputRef}
                         />
                     </div>
-                    <div className={'col-md-2 ' + this._getInputWrapperErrorClass('price')}>
+                    <div className={'edit-item ' + this._getInputWrapperErrorClass('price')}>
                         <input
                             type="number"
                             step="0.01"
@@ -315,7 +315,7 @@ export default class ProductsForm extends Component {
                             ref={this.priceInputRef}
                         />
                     </div>
-                    <div className={'col-md-2 ' + this._getInputWrapperErrorClass('name')}>
+                    <div className={'edit-item ' + this._getInputWrapperErrorClass('name')}>
                         <input
                             type="text"
                             required
@@ -326,7 +326,7 @@ export default class ProductsForm extends Component {
                             ref={this.nameInputRef}
                         />
                     </div>
-                    <div className={'col-md-4 ' + this._getInputWrapperErrorClass('description')}>
+                    <div className={'edit-item ' + this._getInputWrapperErrorClass('description')}>
                     <textarea
                         name="Product[description]"
                         placeholder="Description"
@@ -335,7 +335,7 @@ export default class ProductsForm extends Component {
                         ref={this.descriptionInputRef}
                     />
                     </div>
-                    <div className="col-md-2 text-center">
+                    <div className="edit-item ">
                         <input
                             type="submit"
                             value={submitText}

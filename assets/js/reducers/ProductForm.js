@@ -40,6 +40,15 @@ export default class ProductForm
                     formErrors,
                     submittingFormId
                 );
+            case actionTypes.PRODUCT_UPDATED:
+                debugger;
+                return this._createState(
+                    action.product.id === formProduct.formId
+                        ? {formId: action.product.id, product: action.product}
+                        : formProduct,
+                    formErrors,
+                    submittingFormId
+                );
             case actionTypes.FORM_ERRORS_SET:
                 return this._createState(
                     formProduct,

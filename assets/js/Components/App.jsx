@@ -40,14 +40,14 @@ export default class App extends Component {
         const {store, apiClient} = this.props;
 
         return (
-            <div className="container">
+            <div className="container-fluid">
                 <HeaderAlert store={store} />
                 <div className={"row"}>
-                    <div className="col-md-6">
+                    <div className="col-md-8">
                         <h3 className="text-center">Products list</h3>
                         <ProductsTable store={store} apiClient={apiClient}/>
                     </div>
-                    <div className="col-md-6">
+                    <div className="col-md-4">
                         <h3 className="text-center">Products form</h3>
                         <div>
                             <ProductsForm

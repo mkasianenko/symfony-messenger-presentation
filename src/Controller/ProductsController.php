@@ -37,7 +37,7 @@ class ProductsController extends Controller
         $form = $this->createForm(
             ProductType::class,
             null,
-            ['validation_groups' => ['create']]
+            ['method' => Request::METHOD_POST, 'validation_groups' => ['create']]
         );
         if ($form->handleRequest($request)->isSubmitted() && $form->isValid()) {
             /** @var Product $product */
@@ -105,7 +105,7 @@ class ProductsController extends Controller
         $form = $this->createForm(
             ProductType::class,
             $product,
-            ['validation_groups' => ['edit']]
+            ['method' => Request::METHOD_PUT, 'validation_groups' => ['edit']]
         );
         if ($form->handleRequest($request)->isSubmitted() && $form->isValid()) {
             /** @var Product $product */

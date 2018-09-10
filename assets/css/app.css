@@ -12,3 +12,27 @@ body {
 .btn:not(:disabled):not(.disabled) {
     cursor: pointer;
 }
+
+.table td{
+    height: 75px;
+    padding: 0px !important;
+    vertical-align: middle !important;
+    min-width: 100px;
+    max-width: 150px;
+}
+
+.edit-items{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 15px;
+    width: 100%;
+}
+
+.edit-item {
+    width: calc(100% / 5);
+}
+
+.edit-item:last-child {
+    width: 50px;
+}
