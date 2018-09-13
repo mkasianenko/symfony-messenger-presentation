@@ -3,7 +3,7 @@ import { forms, buttons } from 'bootstrap-css';
 
 import {
     formSubmittingSet,
-    formProductSet,
+    formFieldsSet,
     formErrorsSet,
     globalMessageSetSuccess,
     globalMessageSetError
@@ -22,6 +22,7 @@ export default class ProductsForm extends Component {
         this._getInputDefaultValue = this._getInputDefaultValue.bind(this);
         this._resetInputs = this._resetInputs.bind(this);
         this._attemptLoadProduct = this._attemptLoadProduct.bind(this);
+        this._getSelfState = this._getSelfState.bind(this);
 
         this.skuInputRef = React.createRef();
         this.priceInputRef = React.createRef();
@@ -32,11 +33,11 @@ export default class ProductsForm extends Component {
     onSubmit(e)
     {
         e.preventDefault();
-        const {store, apiClient, apiClientAction, formId} = this.props;
+        const {store, apiClient, apiClientAction, formId, afterSuccessSubmitCallback} = this.props;
         const formData = new URLSearchParams(new FormData(e.target));
 
-        store.dispatch(formSubmittingSet(formId));
-        store.dispatch(formProductSet(formId, {
+        store.dispatch(formSubmittingSet(formId, true));
+        store.dispatch(formFieldsSet(formId, {
             'sku': formData.get('Product[sku]'),
             'price': formData.get('Product[price]'),
             'name': formData.get('Product[name]'),
@@ -45,13 +46,17 @@ export default class ProductsForm extends Component {
 
         apiClient[apiClientAction](formData, formId).then(
             data => {
-                store.dispatch(formSubmittingSet(null));
+                store.dispatch(formSubmittingSet(formId, false));
                 if (data.success) {
                     this._resetInputs();
-                    store.dispatch(formProductSet(formId, null));
+                    store.dispatch(formFieldsSet(formId, null));
                     store.dispatch(formErrorsSet(formId, {}));
                     if (data.successMessage) {
                         store.dispatch(globalMessageSetSuccess(data.successMessage));
+                    }
+
+                    if ('function' === typeof afterSuccessSubmitCallback) {
+                        afterSuccessSubmitCallback();
                     }
 
                     if (data.id) {
@@ -64,7 +69,7 @@ export default class ProductsForm extends Component {
                 }
             },
             e => {
-                store.dispatch(formSubmittingSet(null));
+                store.dispatch(formSubmittingSet(formId, false));
                 store.dispatch(globalMessageSetError(e));
             }
         );
@@ -120,20 +125,30 @@ export default class ProductsForm extends Component {
     }
 
     /**
+     * @return {Object}|null
+     * @private
+     */
+    _getSelfState()
+    {
+        const {store, formId} = this.props;
+        const {forms} = store.getState();
+        const formState = forms.find(form => form.id === formId);
+
+        return !!formState ? formState : null;
+    }
+
+    /**
      * @param {String} fieldName
      * @return {Array}
      * */
     _getErrors(fieldName)
     {
-        const {store} = this.props;
-        const {formErrors} = store.getState();
-        const {formId, errors} = formErrors;
-
-        if (formId !== this.props.formId || null === errors) {
+        const selfState = this._getSelfState();
+        if (null === selfState || !selfState.errors) {
             return [];
         }
 
-        if (errors[fieldName] && errors[fieldName].length > 0) {
+        if (selfState.errors[fieldName] && selfState.errors[fieldName].length > 0) {
             return errors[fieldName];
         }
 
@@ -188,29 +203,21 @@ export default class ProductsForm extends Component {
      */
     _getInputDefaultValue(fieldName)
     {
-        const {store} = this.props;
-        const {formProduct} = store.getState();
-
-        const {formId, product} = formProduct;
-        if (formId !== this.props.formId) {
-            return null;
+        const selfState = this._getSelfState();
+        if (null === selfState || !selfState.fields) {
+            return [];
         }
 
-        if (null === product) {
-            return null;
-        }
-
-        const fieldValue = product[fieldName];
+        const fieldValue = selfState.fields[fieldName];
 
         return fieldValue ? fieldValue : null;
     }
 
     render()
     {
-        const {store, view, submitText} = this.props;
-        const {submittingFormId} = store.getState();
-
-        if (submittingFormId === this.props.formId) {
+        const {view, submitText} = this.props;
+        const selfState = this._getSelfState();
+        if (selfState && selfState.submitting) {
             return <div className="text-center"><h3>...Submitting form...</h3></div>
         }
 

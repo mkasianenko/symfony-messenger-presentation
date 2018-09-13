@@ -3,9 +3,7 @@ export const stateData = {
     productsLoading: true,
     removingProductId: null,
     editingProductId: null,
+    forms: [],
     globalErrorMessage: null,
-    globalSuccessMessage: null,
-    formProduct: {formId: null, product: null},
-    formErrors: {formId: null, errors: {}},
-    submittingFormId: false
+    globalSuccessMessage: null
 };

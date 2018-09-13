@@ -9,7 +9,8 @@ import {
     globalMessageSetSuccess,
     globalMessageSetError,
     productEditing,
-    productUpdated, formProductSet
+    productUpdated,
+    formFieldsSet
 } from '../actions/actions';
 
 export default class Product extends Component {
@@ -50,7 +51,7 @@ export default class Product extends Component {
     {
         const {store, product} = this.props;
         store.dispatch(productEditing(product.id));
-        store.dispatch(formProductSet(product.id, Object.assign({}, product)));
+        store.dispatch(formFieldsSet(product.id, Object.assign({}, product)));
     }
 
     _stopEdit()
@@ -75,6 +76,7 @@ export default class Product extends Component {
                         apiClientAction="editProduct"
                         productAction={productUpdated}
                         submitText="submit"
+                        afterSuccessSubmitCallback={() => this._stopEdit()}
                         formId={product.id}
                         view="td"
                     />

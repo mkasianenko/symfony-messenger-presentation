@@ -56,6 +56,7 @@ export default class App extends Component {
                                 apiClientAction="addProduct"
                                 productAction={productAdd}
                                 submitText="submit"
+                                afterSuccessSubmitCallback={null}
                                 formId={this.productAddFormId}
                                 view="full"
                             />

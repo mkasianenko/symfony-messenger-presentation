@@ -2,26 +2,39 @@ import { actionTypes } from '../actions/actionTypes';
 
 export default class ProductForm
 {
-    constructor(apiClient)
+    constructor()
     {
         this.reduce = this.reduce.bind(this);
         this._createState = this._createState.bind(this);
+        this._createEmptyState = this._createEmptyState.bind(this);
     }
 
     /**
-     * @param {Object} formProduct
-     * @param {Object} formErrors
-     * @param {String} submittingFormId
+     * @param {String} id
+     * @param {Boolean} submitting
+     * @param {Object} fields
+     * @param {Object} errors
+     *
      * @return {{}}
      * @private
      */
-    _createState(formProduct, formErrors, submittingFormId)
+    _createState(id, submitting, fields, errors)
     {
         return {
-            formProduct: formProduct,
-            formErrors: formErrors,
-            submittingFormId: submittingFormId
+            'id': id,
+            'submitting': false,
+            'fields': fields,
+            'errors': errors
         };
+    }
+
+    /**
+     * @return {{}}
+     * @private
+     */
+    _createEmptyState()
+    {
+        return this._createState(null, false, null, {});
     }
 
     /**
@@ -31,36 +44,24 @@ export default class ProductForm
      */
     reduce(state = {}, action)
     {
-        const {formProduct, formErrors, submittingFormId} = state;
+        const emptyState = this._createEmptyState();
+        const defaultState = Object.assign(emptyState, state);
+        const {submitting, fields, errors} = defaultState;
+        const id = action.id;
 
         switch (action.type) {
-            case actionTypes.FORM_PRODUCT_SET:
-                return this._createState(
-                    {formId: action.formId, product: action.product},
-                    formErrors,
-                    submittingFormId
-                );
-            case actionTypes.PRODUCT_UPDATED:
-                debugger;
-                return this._createState(
-                    action.product.id === formProduct.formId
-                        ? {formId: action.product.id, product: action.product}
-                        : formProduct,
-                    formErrors,
-                    submittingFormId
-                );
-            case actionTypes.FORM_ERRORS_SET:
-                return this._createState(
-                    formProduct,
-                    {formId: action.formId, errors: action.errors},
-                    submittingFormId
-                );
             case actionTypes.FORM_SUBMITTING_SET:
-                return this._createState(formProduct, formErrors, action.formId);
+                return this._createState(id, action.submitting, fields, errors);
+            case actionTypes.FORM_FIELDS_SET:
+                return this._createState(id, submitting, action.fields, errors);
+            case actionTypes.FORM_ERRORS_SET:
+                return this._createState(id, submitting, fields, action.errors);
+            case actionTypes.FORM_STATE_SET:
+                return this._createState(id, action.submitting, action.fields, action.errors);
             default:
                 break;
         }
 
-        return this._createState(formProduct, formErrors, submittingFormId);
+        return this._createEmptyState();
     }
 };

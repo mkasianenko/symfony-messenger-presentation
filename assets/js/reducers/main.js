@@ -1,13 +1,12 @@
 import GlobalMessages from './GlobalMessages';
 import Products from './Products';
-import ProductForm from './ProductForm';
+import Forms from './Forms';
 
 const globalMessages = new GlobalMessages();
 const products = new Products();
-const productForm = new ProductForm();
+const forms = new Forms();
 
 export const main = (state = {}, action) => {
-
     console.info(action);
 
     return Object.assign(
@@ -15,6 +14,6 @@ export const main = (state = {}, action) => {
         state,
         products.reduce(state, action),
         globalMessages.reduce(state, action),
-        productForm.reduce(state, action)
+        forms.reduce(state, action)
     );
 };
