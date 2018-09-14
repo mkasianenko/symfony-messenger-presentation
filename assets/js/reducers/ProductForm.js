@@ -22,7 +22,7 @@ export default class ProductForm
     {
         return {
             'id': id,
-            'submitting': false,
+            'submitting': submitting,
             'fields': fields,
             'errors': errors
         };

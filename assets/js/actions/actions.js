@@ -72,13 +72,13 @@ export const productEditing = (id) => withTypeAndId(actionTypes.PRODUCT_EDITING,
  * @param {string} id
  * @return {{type: string, id: string}}
  */
-export const productRemoving = (id) => withTypeAndId(actionTypes.PRODUCT_REMOVING, {id: id});
+export const productRemoving = (id) => withTypeAndId(actionTypes.PRODUCT_REMOVING, id);
 
 /**
  * @param {string} id
  * @return {{type: string, id: string}}
  */
-export const productRemoved = (id) => withTypeAndId(actionTypes.PRODUCT_REMOVED, {id: id});
+export const productRemoved = (id) => withTypeAndId(actionTypes.PRODUCT_REMOVED, id);
 
 /******************************************
  ******************* FORM_ACTIONS ********
@@ -87,7 +87,7 @@ export const productRemoved = (id) => withTypeAndId(actionTypes.PRODUCT_REMOVED,
 /**
  * @param {string} id
  * @param {Object} fields
- * @return {{type: string, formId: string, fields: Object}}
+ * @return {{type: string, id: string, fields: Object}}
  */
 export const formFieldsSet = (id, fields) => mixTwo(
     withTypeAndId(actionTypes.FORM_FIELDS_SET, id),

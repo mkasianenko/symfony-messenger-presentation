@@ -10,7 +10,8 @@ import {
     globalMessageSetError,
     productEditing,
     productUpdated,
-    formFieldsSet
+    formFieldsSet,
+    formErrorsSet
 } from '../actions/actions';
 
 export default class Product extends Component {
@@ -56,7 +57,10 @@ export default class Product extends Component {
 
     _stopEdit()
     {
-        this.props.store.dispatch(productEditing(null));
+        const {store, product} = this.props;
+        store.dispatch(productEditing(null));
+        store.dispatch(formFieldsSet(product.id, null));
+        store.dispatch(formErrorsSet(product.id, {}));
     }
 
     render() {

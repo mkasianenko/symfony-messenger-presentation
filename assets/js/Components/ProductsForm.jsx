@@ -46,7 +46,6 @@ export default class ProductsForm extends Component {
 
         apiClient[apiClientAction](formData, formId).then(
             data => {
-                store.dispatch(formSubmittingSet(formId, false));
                 if (data.success) {
                     this._resetInputs();
                     store.dispatch(formFieldsSet(formId, null));
@@ -55,17 +54,18 @@ export default class ProductsForm extends Component {
                         store.dispatch(globalMessageSetSuccess(data.successMessage));
                     }
 
-                    if ('function' === typeof afterSuccessSubmitCallback) {
-                        afterSuccessSubmitCallback();
-                    }
-
                     if (data.id) {
                         return this._attemptLoadProduct(data.id);
+                    } else {
+                        if ('function' === typeof afterSuccessSubmitCallback) {
+                            afterSuccessSubmitCallback();
+                        }
                     }
                 }
 
                 if (data.errors) {
                     store.dispatch(formErrorsSet(formId, data.errors));
+                    store.dispatch(formSubmittingSet(formId, false));
                 }
             },
             e => {
@@ -84,7 +84,7 @@ export default class ProductsForm extends Component {
      */
     _attemptLoadProduct(id, timeoutSeconds = 1, attempts = 5, increment = 5)
     {
-        const {store, apiClient, productAction} = this.props;
+        const {store, apiClient, productAction, formId, afterSuccessSubmitCallback} = this.props;
         let attemptNum = 0;
         let finished = false;
         let timeout = timeoutSeconds;
@@ -96,6 +96,7 @@ export default class ProductsForm extends Component {
                 `trying to load added product with id #${id}, attempt #${attemptNum}, timeoutSeconds #${timeout}`
             );
             if (finished || attemptNum > attempts) {
+                store.dispatch(formSubmittingSet(formId, false));
                 return;
             }
 
@@ -104,6 +105,10 @@ export default class ProductsForm extends Component {
                     product => {
                         finished = true;
                         store.dispatch(productAction(product));
+                        store.dispatch(formSubmittingSet(formId, false));
+                        if ('function' === typeof afterSuccessSubmitCallback) {
+                            afterSuccessSubmitCallback();
+                        }
                     },
                     e => {
                         console.log(e);
@@ -118,10 +123,10 @@ export default class ProductsForm extends Component {
 
     _resetInputs()
     {
-        this.skuInputRef.current.value = null;
-        this.priceInputRef.current.value = null;
-        this.nameInputRef.current.value = null;
-        this.descriptionInputRef.current.value = null;
+        this.skuInputRef.current ? this.skuInputRef.current.value = null: 0;
+        this.priceInputRef.current ? this.priceInputRef.current.value = null: 0;
+        this.nameInputRef.current ? this.nameInputRef.current.value = null: 0;
+        this.descriptionInputRef.value ? this.descriptionInputRef.current.value = null: 0;
     }
 
     /**
@@ -148,7 +153,8 @@ export default class ProductsForm extends Component {
             return [];
         }
 
-        if (selfState.errors[fieldName] && selfState.errors[fieldName].length > 0) {
+        const errors = selfState.errors;
+        if (errors[fieldName] && errors[fieldName].length > 0) {
             return errors[fieldName];
         }
 
@@ -205,7 +211,7 @@ export default class ProductsForm extends Component {
     {
         const selfState = this._getSelfState();
         if (null === selfState || !selfState.fields) {
-            return [];
+            return null;
         }
 
         const fieldValue = selfState.fields[fieldName];
