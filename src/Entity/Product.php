@@ -12,7 +12,7 @@ class Product implements \JsonSerializable
     /** @var string */
     private $sku;
 
-    /** @var string */
+    /** @var float */
     private $price;
 
     /** @var string */
@@ -45,12 +45,12 @@ class Product implements \JsonSerializable
         return $this;
     }
 
-    public function getPrice(): ?string
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice(string $price): self
+    public function setPrice(float $price): self
     {
         $this->price = $price;
 

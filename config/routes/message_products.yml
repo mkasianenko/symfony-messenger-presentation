@@ -1,0 +1,30 @@
+message_products_list:
+    path: '/message/products'
+    controller:  App\Controller\MessageProductsController::listAction
+    methods: [ GET ]
+
+message_product_get:
+    path: '/message/products/{id}'
+    controller:  App\Controller\MessageProductsController::getAction
+    requirements:
+        id: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+    methods: [ GET ]
+
+message_product_add:
+    path: '/message/products'
+    controller:  App\Controller\MessageProductsController::addAction
+    methods: [ POST ]
+
+message_product_edit:
+    path: '/message/products/{id}'
+    controller:  App\Controller\MessageProductsController::editAction
+    requirements:
+        id: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+    methods: [ PUT ]
+
+message_product_delete:
+    path: '/message/products/{id}'
+    controller:  App\Controller\MessageProductsController::deleteAction
+    requirements:
+        id: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+    methods: [ DELETE ]

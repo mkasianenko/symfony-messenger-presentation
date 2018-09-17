@@ -12,7 +12,7 @@ App\Entity\Product:
             length: 255
             unique: true
         price:
-            type: decimal
+            type: float
             precision: 10
             scale: 4
             nullable: false
