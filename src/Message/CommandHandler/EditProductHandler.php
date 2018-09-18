@@ -6,11 +6,11 @@ namespace App\Message\CommandHandler;
 
 use App\Entity\Product;
 use App\Message\AbstractHandler\AbstractProductHandler;
-use App\Message\Command\AddProduct;
+use App\Message\Command\EditProduct;
 
-class AddProductHandler extends AbstractProductHandler
+class EditProductHandler extends AbstractProductHandler
 {
-    public function __invoke(AddProduct $message): void
+    public function __invoke(EditProduct $message): void
     {
         $product = (new Product())
             ->setId($message->getId())

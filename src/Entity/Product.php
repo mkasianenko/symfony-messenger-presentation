@@ -18,7 +18,7 @@ class Product implements \JsonSerializable
     /** @var string */
     private $name;
 
-    /** @var string */
+    /** @var string|null */
     private $description;
 
     public function getId(): ?string
@@ -74,7 +74,7 @@ class Product implements \JsonSerializable
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 
