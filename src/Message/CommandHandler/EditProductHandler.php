@@ -12,15 +12,17 @@ class EditProductHandler extends AbstractProductHandler
 {
     public function __invoke(EditProduct $message): void
     {
-        $product = (new Product())
-            ->setId($message->getId())
-            ->setSku($message->getSku())
-            ->setPrice($message->getPrice())
-            ->setName($message->getName())
-            ->setDescription($message->getDescription());
+        /** @var Product $product */
+        if (null !== $product = $this->getProductRepository()->find($message->getId())) {
+            $product
+                ->setSku($message->getSku())
+                ->setPrice($message->getPrice())
+                ->setName($message->getName())
+                ->setDescription($message->getDescription());
 
-        $productManager = $this->getProductManager();
-        $productManager->persist($product);
-        $productManager->flush();
+            $productManager = $this->getProductManager();
+            $productManager->persist($product);
+            $productManager->flush();
+        }
     }
 }

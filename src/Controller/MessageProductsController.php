@@ -21,7 +21,7 @@ class MessageProductsController extends Controller
     private const QUERY_PARAM_LIMIT = 'limit';
     private const QUERY_PARAM_PAGE = 'page';
 
-    public function listAction(Request $request, MessageBusInterface $messageBus)
+    public function listAction(Request $request, MessageBusInterface $messageBus): Response
     {
         $limit = $request->query->getInt(self::QUERY_PARAM_LIMIT, 5);
         $page = $request->query->getInt(self::QUERY_PARAM_PAGE, 0);
@@ -89,14 +89,9 @@ class MessageProductsController extends Controller
 
     public function editAction(Request $request, string $id, MessageBusInterface $messageBus): Response
     {
-        $repository = $this->getDoctrine()->getRepository(Product::class);
-        if (null === $product = $repository->find($id)) {
-            return new Response('', Response::HTTP_NOT_FOUND);
-        }
-
         $form = $this->createForm(
             ProductType::class,
-            $product,
+            null,
             ['method' => Request::METHOD_PUT, 'validation_groups' => ['edit']]
         );
         if ($form->handleRequest($request)->isSubmitted() && $form->isValid()) {
