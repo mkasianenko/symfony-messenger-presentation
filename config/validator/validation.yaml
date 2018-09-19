@@ -45,3 +45,134 @@ App\Entity\Product:
                 groups: [create, edit]
                 max: 4000
                 maxMessage: Description value is too long. It should have {{ limit }} characters or less.
+
+App\Message\Query\ProductList:
+    properties:
+        limit:
+            - NotBlank: ~
+            - Type:
+                type: integer
+                message: limit should be of type {{ type }}.
+            - LessThanOrEqual:
+                value: 100
+                message: limit value should be less than or equal to {{ compared_value }}.
+        page:
+            - NotBlank: ~
+            - Type:
+                type: integer
+                message: page should be of type {{ type }}.
+            - LessThanOrEqual:
+                value: 10000
+                message: page value should be less than or equal to {{ compared_value }}.
+
+App\Message\Command\AddProduct:
+    properties:
+        id:
+            - Uuid:
+                strict: true
+                versions: [4]
+                groups: [create]
+        sku:
+            - NotBlank:
+                groups: [create]
+            - Length:
+                groups: [create]
+                min: 2
+                max: 254
+                minMessage: Sku value is too short. It should have {{ limit }} characters or more.
+                maxMessage: Sku value is too long. It should have {{ limit }} characters or less.
+            - App\Validator\Constraints\UniqueProductSku:
+                groups: [create]
+        price:
+            - NotBlank:
+                groups: [create]
+            - Type:
+                groups: [create]
+                type: numeric
+                message: Price value should be of type {{ type }}.
+            - LessThanOrEqual:
+                groups: [create]
+                value: 9999999999.9999
+                message: Price value should be less than or equal to {{ compared_value }}.
+            - GreaterThan:
+                groups: [create]
+                value: 0
+                message: Price value should be greater than {{ compared_value }}.
+        name:
+            - NotBlank:
+                groups: [create]
+            - Length:
+                groups: [create]
+                min: 5
+                max: 254
+                minMessage: Name value is too short. It should have {{ limit }} characters or more.
+                maxMessage: Name value is too long. It should have {{ limit }} characters or less.
+        description:
+            - Length:
+                groups: [create]
+                max: 4000
+                maxMessage: Description value is too long. It should have {{ limit }} characters or less.
+
+App\Message\Command\EditProduct:
+    properties:
+        id:
+            - NotBlank:
+                groups: [edit]
+            - Uuid:
+                strict: true
+                versions: [4]
+                groups: [edit]
+        sku:
+            - NotBlank:
+                groups: [edit]
+            - Length:
+                groups: [edit]
+                min: 2
+                max: 254
+                minMessage: Sku value is too short. It should have {{ limit }} characters or more.
+                maxMessage: Sku value is too long. It should have {{ limit }} characters or less.
+        price:
+            - NotBlank:
+                groups: [edit]
+            - Type:
+                groups: [edit]
+                type: numeric
+                message: Price value should be of type {{ type }}.
+            - LessThanOrEqual:
+                groups: [edit]
+                value: 9999999999.9999
+                message: Price value should be less than or equal to {{ compared_value }}.
+            - GreaterThan:
+                groups: [edit]
+                value: 0
+                message: Price value should be greater than {{ compared_value }}.
+        name:
+            - NotBlank:
+                groups: [edit]
+            - Length:
+                groups: [edit]
+                min: 5
+                max: 254
+                minMessage: Name value is too short. It should have {{ limit }} characters or more.
+                maxMessage: Name value is too long. It should have {{ limit }} characters or less.
+        description:
+            - Length:
+                groups: [edit]
+                max: 4000
+                maxMessage: Description value is too long. It should have {{ limit }} characters or less.
+
+App\Message\Command\DeleteProduct:
+    properties:
+        id:
+            - NotBlank:
+            - Uuid:
+                strict: true
+                versions: [4]
+
+App\Message\Query\Product:
+    properties:
+        id:
+            - NotBlank:
+            - Uuid:
+                strict: true
+                versions: [4]

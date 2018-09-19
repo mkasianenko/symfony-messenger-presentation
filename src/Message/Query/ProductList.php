@@ -12,7 +12,7 @@ class ProductList
     /** @var int */
     private $page;
 
-    public function __construct(int $limit, int $page)
+    public function __construct($limit, $page)
     {
         $this->limit = $limit;
         $this->page = $page;

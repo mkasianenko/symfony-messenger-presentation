@@ -7,3 +7,11 @@ framework:
         routing:
             # Route your messages to the transports
             # 'App\Message\YourMessage': amqp
+        buses:
+            messenger.bus.default:
+                default_middleware: true
+            messenger.bus.with_validation:
+                default_middleware: true
+                middleware:
+                    - {id: 'messenger.middleware.validation'}
+        default_bus: 'messenger.bus.default'

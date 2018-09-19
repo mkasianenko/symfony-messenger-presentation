@@ -108,7 +108,7 @@ class MessageProductsController extends Controller
 
             return new JsonResponse([
                 'success' => true,
-                'successMessage' => sprintf('Product #%s successfully updated', $product->getId()),
+                'successMessage' => sprintf('Product #%s successfully updated', $id),
                 'id' => $id
             ]);
         }

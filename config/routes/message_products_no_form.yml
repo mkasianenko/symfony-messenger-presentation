@@ -1,0 +1,30 @@
+no_form_message_products_list:
+    path: '/no_form/message/products'
+    controller:  App\Controller\MessageProductNoFormController::listAction
+    methods: [ GET ]
+
+no_form_message_product_get:
+    path: '/no_form/message/products/{id}'
+    controller:  App\Controller\MessageProductNoFormController::getAction
+    requirements:
+        id: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+    methods: [ GET ]
+
+no_form_message_product_add:
+    path: '/no_form/message/products'
+    controller:  App\Controller\MessageProductNoFormController::addAction
+    methods: [ POST ]
+
+no_form_message_product_edit:
+    path: '/no_form/message/products/{id}'
+    controller:  App\Controller\MessageProductNoFormController::editAction
+    requirements:
+        id: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+    methods: [ PUT ]
+
+no_form_message_product_delete:
+    path: '/no_form/message/products/{id}'
+    controller:  App\Controller\MessageProductNoFormController::deleteAction
+    requirements:
+        id: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+    methods: [ DELETE ]

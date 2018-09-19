@@ -34,6 +34,15 @@ services:
         resource: '../src/Message/QueryHandler/*'
         tags: ['messenger.message_handler']
 
+    App\Controller\MessageProductNoFormController:
+        autowire: false
+        arguments:
+            - '@messenger.bus.with_validation'
+            - '@Ramsey\Uuid\UuidFactoryInterface'
+            - '@App\Form\ErrorsFrontendNormalizer'
+        calls:
+            - [setContainer, ['@service_container']]
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
