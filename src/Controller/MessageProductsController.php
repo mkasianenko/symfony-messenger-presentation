@@ -82,7 +82,11 @@ class MessageProductsController extends Controller
 
     public function getAction(string $id, MessageBusInterface $defaultBus): Response
     {
-        return new JsonResponse($defaultBus->dispatch(new Query\Product($id)));
+        if (null === $product = $defaultBus->dispatch(new Query\Product($id))) {
+            return new Response('', Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse($product);
     }
 
     public function editAction(Request $request, string $id, MessageBusInterface $defaultBus): Response

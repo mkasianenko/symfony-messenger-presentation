@@ -66,7 +66,11 @@ class MessageProductNoFormController extends Controller
 
     public function getAction(string $id, MessageBusInterface $validationBus): Response
     {
-        return new JsonResponse($validationBus->dispatch(new Query\Product($id)));
+        if (null === $product = $validationBus->dispatch(new Query\Product($id))) {
+            return new Response('', Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse($product);
     }
 
     public function editAction(Request $request, string $id, MessageBusInterface $validationBus): Response
