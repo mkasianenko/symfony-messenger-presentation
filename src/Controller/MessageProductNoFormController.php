@@ -49,7 +49,7 @@ class MessageProductNoFormController extends Controller
 
         return new JsonResponse([
             'success' => true,
-            'successMessage' => sprintf('Product #%s successfully added', $id),
+            'successMessage' => sprintf('Product #%s queued for addition', $id),
             'id' => $id
         ]);
     }
@@ -60,13 +60,17 @@ class MessageProductNoFormController extends Controller
 
         return new JsonResponse([
             'success' => true,
-            'successMessage' => sprintf('Product #%s successfully removed', $id)
+            'successMessage' => sprintf('Product #%s queued for remove', $id)
         ]);
     }
 
     public function getAction(string $id, MessageBusInterface $validationBus): Response
     {
-        return new JsonResponse($validationBus->dispatch(new Query\Product($id)));
+        if (null === $product = $validationBus->dispatch(new Query\Product($id))) {
+            return new Response('', Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse($product);
     }
 
     public function editAction(Request $request, string $id, MessageBusInterface $validationBus): Response
@@ -87,7 +91,7 @@ class MessageProductNoFormController extends Controller
 
         return new JsonResponse([
             'success' => true,
-            'successMessage' => sprintf('Product #%s successfully updated', $id),
+            'successMessage' => sprintf('Product #%s queued for update', $id),
             'id' => $id
         ]);
     }

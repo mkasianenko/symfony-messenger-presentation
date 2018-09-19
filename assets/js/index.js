@@ -8,6 +8,6 @@ import ApiClient from './Api/ApiClient.js';
 import App from './Components/App.jsx';
 
 const store = store_factory();
-const apiClient = new ApiClient('http://0.0.0.0:3000');
+const apiClient = new ApiClient('http://0.0.0.0:3001/no_form/message');
 
 render(<App store={store} apiClient={apiClient}/>, document.getElementById('app'));

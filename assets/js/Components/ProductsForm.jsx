@@ -50,8 +50,13 @@ export default class ProductsForm extends Component {
                     this._resetInputs();
                     store.dispatch(formFieldsSet(formId, null));
                     store.dispatch(formErrorsSet(formId, {}));
+
                     if (data.successMessage) {
                         store.dispatch(globalMessageSetSuccess(data.successMessage));
+                    }
+
+                    if ('addProduct' === apiClientAction) {
+                        store.dispatch(formSubmittingSet(formId, false));
                     }
 
                     if (data.id) {
@@ -82,7 +87,7 @@ export default class ProductsForm extends Component {
      * @param {number} increment
      * @private
      */
-    _attemptLoadProduct(id, timeoutSeconds = 1, attempts = 5, increment = 5)
+    _attemptLoadProduct(id, timeoutSeconds = 1, attempts = 100, increment = 5)
     {
         const {store, apiClient, productAction, formId, afterSuccessSubmitCallback} = this.props;
         let attemptNum = 0;

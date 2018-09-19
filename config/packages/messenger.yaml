@@ -3,7 +3,9 @@ framework:
         transports:
             amqp: '%env(MESSENGER_TRANSPORT_DSN)%'
         routing:
-            '*': amqp
+            'App\Message\Command\AddProduct':  amqp
+            'App\Message\Command\DeleteProduct':  amqp
+            'App\Message\Command\EditProduct':  amqp
         buses:
             messenger.bus.default:
                 default_middleware: true
