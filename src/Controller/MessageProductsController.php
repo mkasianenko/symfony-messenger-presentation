@@ -18,21 +18,19 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class MessageProductsController extends Controller
 {
-    private const QUERY_PARAM_LIMIT = 'limit';
-    private const QUERY_PARAM_PAGE = 'page';
-
-    public function listAction(Request $request, MessageBusInterface $messageBus): Response
+    public function listAction(Request $request, MessageBusInterface $defaultBus): Response
     {
-        $limit = $request->query->getInt(self::QUERY_PARAM_LIMIT, 5);
-        $page = $request->query->getInt(self::QUERY_PARAM_PAGE, 0);
+        $limit = $request->query->getInt('limit', 5);
+        $page = $request->query->getInt('page', 0);
+
         $message = new Query\ProductList($limit, $page);
 
-        return new JsonResponse($messageBus->dispatch($message));
+        return new JsonResponse($defaultBus->dispatch($message));
     }
 
     public function addAction(
         Request $request,
-        MessageBusInterface $messageBus,
+        MessageBusInterface $defaultBus,
         UuidFactoryInterface $uuidFactory
     ): Response {
         $form = $this->createForm(
@@ -51,7 +49,7 @@ class MessageProductsController extends Controller
                 $product->getName(),
                 $product->getDescription()
             );
-            $messageBus->dispatch($command);
+            $defaultBus->dispatch($command);
 
             return new JsonResponse([
                 'success' => true,
@@ -72,9 +70,9 @@ class MessageProductsController extends Controller
         );
     }
 
-    public function deleteAction(string $id, MessageBusInterface $messageBus): Response
+    public function deleteAction(string $id, MessageBusInterface $defaultBus): Response
     {
-        $messageBus->dispatch(new Command\DeleteProduct($id));
+        $defaultBus->dispatch(new Command\DeleteProduct($id));
 
         return new JsonResponse([
             'success' => true,
@@ -82,12 +80,12 @@ class MessageProductsController extends Controller
         ]);
     }
 
-    public function getAction(string $id, MessageBusInterface $messageBus): Response
+    public function getAction(string $id, MessageBusInterface $defaultBus): Response
     {
-        return new JsonResponse($messageBus->dispatch(new Query\Product($id)));
+        return new JsonResponse($defaultBus->dispatch(new Query\Product($id)));
     }
 
-    public function editAction(Request $request, string $id, MessageBusInterface $messageBus): Response
+    public function editAction(Request $request, string $id, MessageBusInterface $defaultBus): Response
     {
         $form = $this->createForm(
             ProductType::class,
@@ -104,7 +102,7 @@ class MessageProductsController extends Controller
                 $product->getName(),
                 $product->getDescription()
             );
-            $messageBus->dispatch($command);
+            $defaultBus->dispatch($command);
 
             return new JsonResponse([
                 'success' => true,

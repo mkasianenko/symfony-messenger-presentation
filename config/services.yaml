@@ -12,6 +12,9 @@ services:
         public: false       # Allows optimizing the container by removing unused services; this also means
                             # fetching services directly from the container via $container->get() won't work.
                             # The best practice is to be explicit about your dependencies anyway.
+        bind:
+            $defaultBus: '@messenger.bus.default'
+            $validationBus: '@messenger.bus.with_validation'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -34,15 +37,6 @@ services:
         resource: '../src/Message/QueryHandler/*'
         tags: ['messenger.message_handler']
 
-    App\Controller\MessageProductNoFormController:
-        autowire: false
-        arguments:
-            - '@messenger.bus.with_validation'
-            - '@Ramsey\Uuid\UuidFactoryInterface'
-            - '@App\Form\ErrorsFrontendNormalizer'
-        calls:
-            - [setContainer, ['@service_container']]
-
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
@@ -56,3 +50,8 @@ services:
     # needed as public for controller
     App\Form\ErrorsFrontendNormalizer:
         public: true
+
+    App\EventListener\ValidationExceptionListener:
+        tags:
+            - { name: kernel.event_subscriber }
+            - { name: monolog.logger, channel: request }

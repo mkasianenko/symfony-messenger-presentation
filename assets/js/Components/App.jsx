@@ -26,7 +26,14 @@ export default class App extends Component {
     {
         const {store, apiClient} = this.props;
         apiClient.getProducts().then(
-            products => store.dispatch(productsUpdate(products)),
+            products => {
+                if (products.errors) {
+                    store.dispatch(globalMessageSetError('internal server error'));
+                    return store.dispatch(productsUpdate([]))
+                }
+
+                store.dispatch(productsUpdate(products))
+            },
             e => store.dispatch(globalMessageSetError(e))
         );
     }

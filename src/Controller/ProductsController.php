@@ -17,15 +17,12 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ProductsController extends Controller
 {
-    private const QUERY_PARAM_LIMIT = 'limit';
-    private const QUERY_PARAM_PAGE = 'page';
-
     public function listAction(Request $request): JsonResponse
     {
         $repository = $this->getDoctrine()->getRepository(Product::class);
 
-        $limit = $request->query->getInt(self::QUERY_PARAM_LIMIT, 5);
-        $page = $request->query->getInt(self::QUERY_PARAM_PAGE, 0);
+        $limit = $request->query->getInt('limit', 5);
+        $page = $request->query->getInt('page', 0);
 
         $products = $repository->findBy([], ['sku' => 'ASC'], $limit, $page);
 
