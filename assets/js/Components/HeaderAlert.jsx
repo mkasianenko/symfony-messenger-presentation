@@ -37,12 +37,12 @@ export default class HeaderAlert extends Component {
 
         if (null !== globalErrorMessage) {
             className += ' alert-danger';
-            message = globalErrorMessage;
+            message = 'object' === typeof globalErrorMessage ? globalErrorMessage.message : globalErrorMessage;
         }
 
         if (null !== globalSuccessMessage) {
             className += ' alert-success';
-            message = globalSuccessMessage;
+            message = 'object' === typeof globalSuccessMessage ? globalSuccessMessage.message : globalSuccessMessage;
         }
 
         if (null !== message) {
