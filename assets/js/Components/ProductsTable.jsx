@@ -44,8 +44,8 @@ export default class ProductsTable extends Component {
                 <thead className="table-inverse">
                     <tr>
                         <th>Sku</th>
-                        <th>Name</th>
                         <th>Price</th>
+                        <th>Name</th>
                         <th>Description</th>
                         <th>Actions</th>
                     </tr>

@@ -93,8 +93,8 @@ export default class Product extends Component {
 
         return <tr>
             <td>{product.sku}</td>
-            <td>{product.name}</td>
             <td>{product.price}</td>
+            <td>{product.name}</td>
             <td>{product.description}</td>
             <td>
                 <button
